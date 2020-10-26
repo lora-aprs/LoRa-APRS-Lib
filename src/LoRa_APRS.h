@@ -25,6 +25,8 @@ public:
 
     void sendMessage(const std::shared_ptr<APRSMessage> msg);
 
+    void setTxPower(int level, int outputPin = PA_OUTPUT_PA_BOOST_PIN);
+
     // settings:
     long rx_frequency;
     long tx_frequency;

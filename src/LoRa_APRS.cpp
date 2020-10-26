@@ -80,3 +80,8 @@ void LoRa_APRS::sendMessage(const std::shared_ptr<APRSMessage> msg)
     LoRa.endPacket();
     LoRa.setFrequency(rx_frequency);
 }
+
+void LoRa_APRS::setTxPower(int level, int outputPin = PA_OUTPUT_PA_BOOST_PIN)
+{
+    LoRa.setTxPower(level, outputPin);
+}
