@@ -12,10 +12,11 @@
 #define LORA_SIGNAL_BANDWIDTH (125E3)
 #define LORA_CODING_RATE4 (5)
 
-class LoRa_APRS
+class LoRa_APRS : public LoRa
 {
 public:
     LoRa_APRS();
+    LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq);
     bool begin();
     
     bool hasMessage();
@@ -25,17 +26,16 @@ public:
 
     void sendMessage(const std::shared_ptr<APRSMessage> msg);
 
-    void setTxPower(int level, int outputPin = PA_OUTPUT_PA_BOOST_PIN);
+    void setRxFrequency(long frequency);
+    long getRxFrequency() const;
 
-    // settings:
-    long rx_frequency;
-    long tx_frequency;
-    int spreadingfactor;
-    long signalbandwidth;
-    int codingrate4;
+    void setTxFrequency(long frequency);
+    long getTxFrequency() const;
 
 private:
     std::shared_ptr<APRSMessage> _LastReceivedMsg;
+    long _RxFrequency;
+    long _TxFrequency;
 };
 
 #endif

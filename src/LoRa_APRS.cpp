@@ -1,49 +1,61 @@
 #include <LoRa_APRS.h>
 
 LoRa_APRS::LoRa_APRS()
-    : rx_frequency(LORA_RX_FREQUENCY), tx_frequency(LORA_TX_FREQUENCY), spreadingfactor(LORA_SPREADING_FACTOR),
-      signalbandwidth(LORA_SIGNAL_BANDWIDTH), codingrate4(LORA_CODING_RATE4), _LastReceivedMsg(0)
+    : _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY), _LastReceivedMsg(0)
 {
-	SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-	LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
+    SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+    setPins(LORA_CS, LORA_RST, LORA_IRQ);
+
+    setSpreadingFactor(LORA_SPREADING_FACTOR);
+    setSignalBandwidth(LORA_SIGNAL_BANDWIDTH);
+    setCodingRate4(LORA_CODING_RATE4);
+    enableCrc();
+}
+
+LoRa_APRS::LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq)
+    : _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY), _LastReceivedMsg(0)
+{
+    SPI.begin(sck, miso, mosi, cs);
+    setPins(cs, rst, irq);
+
+    setSpreadingFactor(LORA_SPREADING_FACTOR);
+    setSignalBandwidth(LORA_SIGNAL_BANDWIDTH);
+    setCodingRate4(LORA_CODING_RATE4);
+    enableCrc();
 }
 
 bool LoRa_APRS::begin()
 {
-	if (!LoRa.begin(rx_frequency))
+    if (!begin(_RxFrequency))
     {
         return false;
-	}
-	LoRa.setSpreadingFactor(spreadingfactor);
-	LoRa.setSignalBandwidth(signalbandwidth);
-	LoRa.setCodingRate4(codingrate4);
-	LoRa.enableCrc();
+    }
     return true;
 }
 
 bool LoRa_APRS::hasMessage()
 {
-	if(!LoRa.parsePacket())
-	{
+    if(!parsePacket())
+    {
         return false;
     }
     // read header:
     char dummy[4];
-    LoRa.readBytes(dummy, 3);
+    readBytes(dummy, 3);
     if(dummy[0] != '<')
     {
         // is no APRS message, ignore message
-        while(LoRa.available())
+        while(available())
         {
-            LoRa.read();
+            read();
         }
         return false;
     }
     // read APRS data:
     String str;
-    while(LoRa.available())
+    while(available())
     {
-        str += (char)LoRa.read();
+        str += (char)read();
     }
     _LastReceivedMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
     _LastReceivedMsg->decode(str);
@@ -55,33 +67,39 @@ std::shared_ptr<APRSMessage> LoRa_APRS::getMessage()
     return _LastReceivedMsg;
 }
 
-int LoRa_APRS::getMessageRssi()
-{
-    return LoRa.packetRssi();
-}
-
-float LoRa_APRS::getMessageSnr()
-{
-    return LoRa.packetSnr();
-}
-
 // cppcheck-suppress unusedFunction
 void LoRa_APRS::sendMessage(const std::shared_ptr<APRSMessage> msg)
 {
-    LoRa.setFrequency(tx_frequency);
+    setFrequency(_TxFrequency);
     String data = msg->encode();
-    LoRa.beginPacket();
+    beginPacket();
     // Header:
-    LoRa.write('<');
-    LoRa.write(0xFF);
-    LoRa.write(0x01);
+    write('<');
+    write(0xFF);
+    write(0x01);
     // APRS Data:
-    LoRa.write((const uint8_t *)data.c_str(), data.length());
-    LoRa.endPacket();
-    LoRa.setFrequency(rx_frequency);
+    write((const uint8_t *)data.c_str(), data.length());
+    endPacket();
+    setFrequency(_RxFrequency);
 }
 
-void LoRa_APRS::setTxPower(int level, int outputPin)
+void LoRa_APRS::setRxFrequency(long frequency)
 {
-    LoRa.setTxPower(level, outputPin);
+    _RxFrequency = frequency;
+    setFrequency(_RxFrequency);
+}
+
+long LoRa_APRS::getRxFrequency() const
+{
+    return _RxFrequency;
+}
+
+void LoRa_APRS::setTxFrequency(long frequency)
+{
+    _TxFrequency = frequency;
+}
+
+long LoRa_APRS::getTxFrequency() const
+{
+    return _TxFrequency;
 }
