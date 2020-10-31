@@ -12,17 +12,14 @@
 #define LORA_SIGNAL_BANDWIDTH (125E3)
 #define LORA_CODING_RATE4 (5)
 
-class LoRa_APRS : public LoRa
+class LoRa_APRS : public LoRaClass
 {
 public:
 	LoRa_APRS();
 	LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq);
-	bool begin();
 	
 	bool hasMessage();
 	std::shared_ptr<APRSMessage> getMessage();
-	int getMessageRssi();
-	float getMessageSnr();
 
 	void sendMessage(const std::shared_ptr<APRSMessage> msg);
 

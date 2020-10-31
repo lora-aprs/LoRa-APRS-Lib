@@ -1,7 +1,7 @@
 #include <LoRa_APRS.h>
 
 LoRa_APRS::LoRa_APRS()
-	: _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY), _LastReceivedMsg(0)
+	: _LastReceivedMsg(0), _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY)
 {
 	SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
 	setPins(LORA_CS, LORA_RST, LORA_IRQ);
@@ -13,7 +13,7 @@ LoRa_APRS::LoRa_APRS()
 }
 
 LoRa_APRS::LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq)
-	: _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY), _LastReceivedMsg(0)
+	: _LastReceivedMsg(0), _RxFrequency(LORA_RX_FREQUENCY), _TxFrequency(LORA_TX_FREQUENCY)
 {
 	SPI.begin(sck, miso, mosi, cs);
 	setPins(cs, rst, irq);
@@ -22,15 +22,6 @@ LoRa_APRS::LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq)
 	setSignalBandwidth(LORA_SIGNAL_BANDWIDTH);
 	setCodingRate4(LORA_CODING_RATE4);
 	enableCrc();
-}
-
-bool LoRa_APRS::begin()
-{
-	if (!begin(_RxFrequency))
-	{
-		return false;
-	}
-	return true;
 }
 
 bool LoRa_APRS::hasMessage()
