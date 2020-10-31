@@ -15,27 +15,27 @@
 class LoRa_APRS : public LoRa
 {
 public:
-    LoRa_APRS();
-    LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq);
-    bool begin();
-    
-    bool hasMessage();
-    std::shared_ptr<APRSMessage> getMessage();
-    int getMessageRssi();
-    float getMessageSnr();
+	LoRa_APRS();
+	LoRa_APRS(int sck, int miso, int mosi, int cs, int rst, int irq);
+	bool begin();
+	
+	bool hasMessage();
+	std::shared_ptr<APRSMessage> getMessage();
+	int getMessageRssi();
+	float getMessageSnr();
 
-    void sendMessage(const std::shared_ptr<APRSMessage> msg);
+	void sendMessage(const std::shared_ptr<APRSMessage> msg);
 
-    void setRxFrequency(long frequency);
-    long getRxFrequency() const;
+	void setRxFrequency(long frequency);
+	long getRxFrequency() const;
 
-    void setTxFrequency(long frequency);
-    long getTxFrequency() const;
+	void setTxFrequency(long frequency);
+	long getTxFrequency() const;
 
 private:
-    std::shared_ptr<APRSMessage> _LastReceivedMsg;
-    long _RxFrequency;
-    long _TxFrequency;
+	std::shared_ptr<APRSMessage> _LastReceivedMsg;
+	long _RxFrequency;
+	long _TxFrequency;
 };
 
 #endif
